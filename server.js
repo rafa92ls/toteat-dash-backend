@@ -4,9 +4,9 @@ const { response } = require("express");
 
 const app = express();
 
-// var corsOptions = {
-//     origin: "http://localhost:3000"
-// };
+var corsOptions = {
+    origin: "https://toteat-dash.herokuapp.com"
+};
 
 // app.use(cors(corsOptions));
 
