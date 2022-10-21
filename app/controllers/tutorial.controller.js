@@ -25,7 +25,7 @@ exports.create = (req, res) => {
 exports.findAll = (req, res) => {
     const title = req.query.title;
     var condition = title ? { title: { [Op.like]: `%${title}%` } } : null;
-    res.send([1,2,3,4]);
+    res.send([1,2,3,4,5,6]);
     //     res.status(500).send({
     //       message:
     //         err.message || "Some error occurred while removing all tutorials."

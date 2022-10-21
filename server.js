@@ -5,10 +5,13 @@ const { response } = require("express");
 const app = express();
 
 var corsOptions = {
-    origin: "https://toteat-dash.herokuapp.com"
-};
+    origin: "*",
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    preflightContinue: false,
+    optionsSuccessStatus: 204
+  };
 
-// app.use(cors(corsOptions));
+app.use(cors(corsOptions));
 
 // parse requests of content-type - application/json
 app.use(express.json());
