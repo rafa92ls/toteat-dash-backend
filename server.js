@@ -1,13 +1,14 @@
 const express = require("express");
 const cors = require("cors");
+const { response } = require("express");
 
 const app = express();
 
-var corsOptions = {
-    origin: "http://localhost:3000"
-};
+// var corsOptions = {
+//     origin: "http://localhost:3000"
+// };
 
-app.use(cors(corsOptions));
+// app.use(cors(corsOptions));
 
 // parse requests of content-type - application/json
 app.use(express.json());
@@ -25,6 +26,10 @@ app.use(express.urlencoded({ extended: true }));
 //     });
 
 require("./app/routes/tutorial.routes")(app);
+app.get('/', (req, res) => {
+    res.send('<h1>Test!</h1>')
+})
+
 // set port, listen for requests
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
