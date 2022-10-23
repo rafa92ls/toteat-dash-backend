@@ -28,10 +28,7 @@ app.use(express.urlencoded({ extended: true }));
 //         console.log("Failed to sync db: " + err.message);
 //     });
 
-require("./app/routes/tutorial.routes")(app);
-app.get('/', (req, res) => {
-    res.send('<h1>Test!</h1>')
-})
+require("./app/routes/ventas.routes")(app);
 
 // set port, listen for requests
 const PORT = process.env.PORT || 8080;
