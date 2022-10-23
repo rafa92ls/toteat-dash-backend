@@ -1,19 +1,15 @@
-module.exports = app => {
-    const tutorials = require("../controllers/ventas.controller.js");
+module.exports = (app, verification) => {
+    const ventas = require("../controllers/ventas.controller.js");
 
     var router = require("express").Router();
 
-    // Create a new Tutorial
-    router.post("/", tutorials.create);
+    router.post("/", ventas.create);
 
-    // Retrieve all Tutorials
-    router.get("/", tutorials.findAll);
+    router.get("/", ventas.findAll);
 
-    // Retrieve a single Tutorial with id
-    router.get("/:id", tutorials.findOne);
+    router.get("/:id", ventas.findOne);
 
-    // Delete all Tutorials
-    router.delete("/", tutorials.deleteAll);
+    router.delete("/", ventas.deleteAll);
 
-    app.use('/api/tutorials', router);
+    app.use('/api/ventas', verification, router);
 };

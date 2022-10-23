@@ -10,27 +10,46 @@ var corsOptions = {
     preflightContinue: false,
     optionsSuccessStatus: 204
   };
-
 app.use(cors(corsOptions));
 
-// parse requests of content-type - application/json
-app.use(express.json());
 
-// parse requests of content-type - application/x-www-form-urlencoded
+const keys = require('./app/settings/keys')
+app.set('key', keys.key)
+
+
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// const db = require("./app/models");
-// db.sequelize.sync()
-//     .then(() => {
-//         console.log("Synced db.");
-//     })
-//     .catch((err) => {
-//         console.log("Failed to sync db: " + err.message);
-//     });
+const jwt = require('jsonwebtoken')
+const verification = express.Router()
+verification.use( (req, res, next) => {
+    let token = req.headers['x-access-token'] || req.headers['authorization']
 
-require("./app/routes/ventas.routes")(app);
+    if(!token) {
+        return res.status(401).send({
+            error: 'Token Inválido'
+        })
+    }
+    if(token.startsWith('Bearer ')){
+        token = token.slice(7, token.length)
+    }
+    if(token){
+        jwt.verify(token, app.get('key'), (error, decoded) => {
+            if (error) {
+                return res.json({
+                    message: 'Token Inválido'
+                })
+            } else {
+                req.decoded = decoded
+                next()
+            }
+        })
+    }
+})
 
-// set port, listen for requests
+require("./app/routes/ventas.routes")(app, verification);
+require("./app/routes/login.routes")(app);
+
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}.`);

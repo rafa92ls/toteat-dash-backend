@@ -1,6 +1,6 @@
 const axios = require('axios')
 
-// Create and Save a new Tutorial
+
 exports.create = (req, res) => {
   return res.send([{ data: "OK!" }]);
   // Validate request
@@ -11,7 +11,7 @@ exports.create = (req, res) => {
     return;
   }
 
-  // Create a Tutorial
+
   const tutorial = {
     title: req.body.title,
     description: req.body.description,
@@ -19,7 +19,6 @@ exports.create = (req, res) => {
   };
 };
 
-// Retrieve all Tutorials from the database.
 exports.findAll = async (req, res) => {
   try {
     const title = req.query.title;
@@ -29,8 +28,7 @@ exports.findAll = async (req, res) => {
     const datesH = data.filter(el => {
       return el.date_closed === '2019-03-18 15:40:47'
     })
-    console.log('datesH', datesH);
-    res.send(data);
+    res.send(datesH);
     //     res.status(500).send({
     //       message:
     //         err.message || "Some error occurred while removing all tutorials."
@@ -44,10 +42,9 @@ exports.findAll = async (req, res) => {
   }
 };
 
-// Find a single Tutorial with an id
 exports.findOne = (req, res) => {
   const id = req.params.id;
 };
-// Delete all Tutorials from the database.
+
 exports.deleteAll = (req, res) => {
 };
