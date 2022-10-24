@@ -36,8 +36,8 @@ verification.use( (req, res, next) => {
     if(token){
         jwt.verify(token, app.get('key'), (error, decoded) => {
             if (error) {
-                return res.json({
-                    message: 'Token Inválido'
+                return res.status(401).send({
+                    error: 'Token Inválido'
                 })
             } else {
                 req.decoded = decoded
