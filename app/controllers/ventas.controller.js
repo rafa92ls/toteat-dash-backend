@@ -1,47 +1,353 @@
 const axios = require('axios')
 const _ = require('lodash')
 
-exports.create = (req, res) => {
-  return res.send([{ data: "OK!" }]);
-  // Validate request
-  if (!req.body.title) {
-    res.status(400).send({
-      message: "Content can not be empty!"
+exports.categorias = async (req, res) => {
+  try {
+    const { data, status } = await axios.get('https://storage.googleapis.com/backupdatadev/ejercicio/ventas.json')
+
+    if (status !== 200) {
+      res.status(500).send({
+        message: 'Error en el Servidor'
+      });
+    }
+    let productosTotales = []
+    for (const inputs of data) {
+      productosTotales = productosTotales.concat(inputs.products)
+    }
+
+    const productosCategorias = agruparDatos(productosTotales, 'category')
+
+    const resp = {}
+    for (const [key, products] of Object.entries(productosCategorias)) {
+      const productosNombre = agruparDatos(products, 'name')
+
+      for (const [key2, infoProd] of Object.entries(productosNombre)) {
+        let priceTotal = 0
+        let quantityTotal = 0
+        for (priceQty of infoProd) {
+          priceTotal += priceQty.price
+          quantityTotal += priceQty.quantity
+        }
+        productosNombre[key2] = { priceTotal, quantityTotal }
+      }
+      resp[key] = productosNombre
+    }
+    res.send(resp)
+
+  } catch (error) {
+    res.status(500).send({
+      message: error
     });
-    return;
   }
-
-
-  const tutorial = {
-    title: req.body.title,
-    description: req.body.description,
-    published: req.body.published ? req.body.published : false
-  };
 };
 
-exports.findAll = async (req, res) => {
+exports.categoriasPorFecha = async (req, res) => {
+  try {
+    const fechaInicio = new Date(req.params.fecha1)
+    const fechaFinal = new Date(req.params.fecha2)
+
+    if (!fechaInicio.getDate() || !fechaFinal.getDate()) {
+      return res.status(400).send({
+        message: 'Error en las fechas ingresadas'
+      });
+    }
+
+    const { data, status } = await axios.get('https://storage.googleapis.com/backupdatadev/ejercicio/ventas.json')
+
+    if (status !== 200) {
+      return res.status(500).send({
+        message: 'Error en el Servidor'
+      });
+    }
+
+    let productosTotales = []
+    for (const inputs of data) {
+      const products = []
+      for (const prodDetail of inputs.products) {
+        const fechaProd = new Date(inputs.date_closed.split(' ')[0])
+        if (fechaInicio <= fechaProd && fechaFinal >= fechaProd) {
+          prodDetail.fecha = inputs.date_closed.split(' ')[0]
+          products.push(prodDetail)
+        }
+      }
+      productosTotales = productosTotales.concat(products)
+    }
+
+    const productosCategorias = agruparDatos(productosTotales, 'category')
+
+    const resp = {}
+    for (const [key, products] of Object.entries(productosCategorias)) {
+      const productosNombre = agruparDatos(products, 'name')
+
+      for (const [key2, infoProd] of Object.entries(productosNombre)) {
+        let priceTotal = 0
+        let quantityTotal = 0
+        for (priceQty of infoProd) {
+          priceTotal += priceQty.price
+          quantityTotal += priceQty.quantity
+        }
+        productosNombre[key2] = { priceTotal, quantityTotal }
+      }
+      resp[key] = productosNombre
+    }
+    res.send(resp)
+
+  } catch (error) {
+    res.status(500).send({
+      message: error
+    });
+  }
+}
+
+exports.zonas = async (req, res) => {
+  try {
+    const { data, status } = await axios.get('https://storage.googleapis.com/backupdatadev/ejercicio/ventas.json')
+
+    if (status !== 200) {
+      res.status(500).send({
+        message: 'Error en el Servidor'
+      });
+    }
+
+    const productosZonas = agruparDatos(data, 'zone')
+
+    let productosTotales = {}
+    for (const [key, zones] of Object.entries(productosZonas)) {
+      let prodZona = []
+      for (const zone of zones) {
+        prodZona = prodZona.concat(zone.products)
+      }
+
+      const productosCategorias = agruparDatos(prodZona, 'category')
+
+      const resp = {}
+      for (const [key, products] of Object.entries(productosCategorias)) {
+        const productosNombre = agruparDatos(products, 'name')
+
+        for (const [key2, infoProd] of Object.entries(productosNombre)) {
+          let priceTotal = 0
+          let quantityTotal = 0
+          for (priceQty of infoProd) {
+            priceTotal += priceQty.price
+            quantityTotal += priceQty.quantity
+          }
+          productosNombre[key2] = { priceTotal, quantityTotal }
+        }
+        resp[key] = productosNombre
+      }
+      productosTotales[key] = resp
+    }
+
+    res.send(productosTotales)
+
+  } catch (error) {
+    console.log(error)
+    res.status(500).send({
+      message: error
+    });
+  }
+}
+
+exports.zonasPorFecha = async (req, res) => {
+  try {
+    const fechaInicio = new Date(req.params.fecha1)
+    const fechaFinal = new Date(req.params.fecha2)
+
+    if (!fechaInicio.getDate() || !fechaFinal.getDate()) {
+      return res.status(400).send({
+        message: 'Error en las fechas ingresadas'
+      });
+    }
+
+    const { data, status } = await axios.get('https://storage.googleapis.com/backupdatadev/ejercicio/ventas.json')
+
+    if (status !== 200) {
+      res.status(500).send({
+        message: 'Error en el Servidor'
+      });
+    }
+
+    const productosZonas = agruparDatos(data, 'zone')
+
+    let productosTotales = {}
+    for (const [key, zones] of Object.entries(productosZonas)) {
+
+      let prodZona = []
+      for (const zone of zones) {
+        const products = []
+        for (const prod of zone.products) {
+          const fechaProd = new Date(zone.date_closed.split(' ')[0])
+          if (fechaInicio <= fechaProd && fechaFinal >= fechaProd) {
+            prod.fecha = zone.date_closed.split(' ')[0]
+            products.push(prod)
+          }
+        }
+        prodZona = prodZona.concat(products)
+      }
+
+      const productosCategorias = agruparDatos(prodZona, 'category')
+
+      const resp = {}
+      for (const [key, products] of Object.entries(productosCategorias)) {
+        const productosNombre = agruparDatos(products, 'name')
+
+        for (const [key2, infoProd] of Object.entries(productosNombre)) {
+          let priceTotal = 0
+          let quantityTotal = 0
+          for (priceQty of infoProd) {
+            priceTotal += priceQty.price
+            quantityTotal += priceQty.quantity
+          }
+          productosNombre[key2] = { priceTotal, quantityTotal }
+        }
+        resp[key] = productosNombre
+      }
+      productosTotales[key] = resp
+    }
+
+    res.send(productosTotales)
+
+  } catch (error) {
+    console.log(error)
+    res.status(500).send({
+      message: error
+    });
+  }
+}
+
+exports.meseros = async (req, res) => {
+  try {
+    const { data, status } = await axios.get('https://storage.googleapis.com/backupdatadev/ejercicio/ventas.json')
+
+    if (status !== 200) {
+      res.status(500).send({
+        message: 'Error en el Servidor'
+      });
+    }
+
+    const productosZonas = agruparDatos(data, 'waiter')
+
+    let productosTotales = {}
+    for (const [key, zones] of Object.entries(productosZonas)) {
+      let prodZona = []
+      for (const zone of zones) {
+        prodZona = prodZona.concat(zone.products)
+      }
+
+      const productosCategorias = agruparDatos(prodZona, 'category')
+
+      const resp = {}
+      for (const [key, products] of Object.entries(productosCategorias)) {
+        const productosNombre = agruparDatos(products, 'name')
+
+        for (const [key2, infoProd] of Object.entries(productosNombre)) {
+          let priceTotal = 0
+          let quantityTotal = 0
+          for (priceQty of infoProd) {
+            priceTotal += priceQty.price
+            quantityTotal += priceQty.quantity
+          }
+          productosNombre[key2] = { priceTotal, quantityTotal }
+        }
+        resp[key] = productosNombre
+      }
+      productosTotales[key] = resp
+    }
+
+    res.send(productosTotales)
+
+  } catch (error) {
+    console.log(error)
+    res.status(500).send({
+      message: error
+    });
+  }
+}
+
+exports.cajeros = async (req, res) => {
+  try {
+    const { data, status } = await axios.get('https://storage.googleapis.com/backupdatadev/ejercicio/ventas.json')
+
+    if (status !== 200) {
+      res.status(500).send({
+        message: 'Error en el Servidor'
+      });
+    }
+
+    const productosZonas = agruparDatos(data, 'cashier')
+
+    let productosTotales = {}
+    for (const [key, zones] of Object.entries(productosZonas)) {
+      let prodZona = []
+      for (const zone of zones) {
+        prodZona = prodZona.concat(zone.products)
+      }
+
+      const productosCategorias = agruparDatos(prodZona, 'category')
+
+      const resp = {}
+      for (const [key, products] of Object.entries(productosCategorias)) {
+        const productosNombre = agruparDatos(products, 'name')
+
+        for (const [key2, infoProd] of Object.entries(productosNombre)) {
+          let priceTotal = 0
+          let quantityTotal = 0
+          for (priceQty of infoProd) {
+            priceTotal += priceQty.price
+            quantityTotal += priceQty.quantity
+          }
+          productosNombre[key2] = { priceTotal, quantityTotal }
+        }
+        resp[key] = productosNombre
+      }
+      productosTotales[key] = resp
+    }
+
+    res.send(productosTotales)
+
+  } catch (error) {
+    console.log(error)
+    res.status(500).send({
+      message: error
+    });
+  }
+};
+
+exports.mediosPago = async (req, res) => {
   try {
     const title = req.query.title;
     var condition = title ? { title: { [Op.like]: `%${title}%` } } : null;
     const { data, status } = await axios.get('https://storage.googleapis.com/backupdatadev/ejercicio/ventas.json')
 
-    const datesH = data.filter(el => {
-      return el.date_closed === '2019-03-10 14:42:28'
-    })
-    // const zonas = []
-    // for(inputs of data) {
-    //   if (!zonas.includes(inputs.waiter)) {
-    //     zonas.push(inputs.waiter)
-    //   }
-    // }
-    res.send(datesH);
-    //     res.status(500).send({
-    //       message:
-    //         err.message || "Some error occurred while removing all tutorials."
-    //     });
+    if (status !== 200) {
+      res.status(500).send({
+        message: 'Error en el Servidor'
+      });
+    }
+
+
+    let productosTotales = []
+    let totalTest = 0
+    for (const inputs of data) {
+      totalTest += inputs.total
+      productosTotales = productosTotales.concat(inputs.payments)
+    }
+
+    const productosCategorias = agruparDatos(productosTotales, 'type')
+
+    const resp = {}
+    for (const [key, products] of Object.entries(productosCategorias)) {
+
+      let amountTotal = 0
+      for (const payment of products) {
+        amountTotal += payment.amount
+      }
+
+      resp[key] = amountTotal
+    }
+    res.send(resp)
 
   } catch (error) {
-    console.log('ERROR!!', error)
     res.status(500).send({
       message: error
     });
@@ -64,30 +370,17 @@ exports.productos = async (req, res) => {
       productosTotales = productosTotales.concat(inputs.products)
     }
 
-    const productosCategorias =
-      _.mapValues(
-        _.groupBy(productosTotales, 'category'),
-        el => el.map(el2 => _.omit(el2, 'category'))
-      )
+    const productosCategorias = agruparDatos(productosTotales, 'name')
 
     const resp = {}
     for (const [key, products] of Object.entries(productosCategorias)) {
-      const productosNombre =
-        _.mapValues(
-          _.groupBy(products, 'name'),
-          el => el.map(el2 => _.omit(el2, 'name'))
-        )
-
-      for (const [key2, infoProd] of Object.entries(productosNombre)) {
-        let priceTotal = 0
-        let quantityTotal = 0
-        for (priceQty of infoProd) {
-          priceTotal += priceQty.price
-          quantityTotal += priceQty.quantity
-        }
-        productosNombre[key2] = { priceTotal, quantityTotal }
+      let amountTotal = 0
+      let quantityTotal = 0
+      for (const payment of products) {
+        amountTotal += payment.price
+        quantityTotal += payment.quantity
       }
-      resp[key] = productosNombre
+      resp[key] = { amountTotal, quantityTotal }
     }
     res.send(resp)
 
@@ -96,17 +389,23 @@ exports.productos = async (req, res) => {
       message: error
     });
   }
-};
+}
 
 exports.productosPorFecha = async (req, res) => {
   try {
     const fechaInicio = new Date(req.params.fecha1)
     const fechaFinal = new Date(req.params.fecha2)
-    
+
+    if (!fechaInicio.getDate() || !fechaFinal.getDate()) {
+      return res.status(400).send({
+        message: 'Error en las fechas ingresadas'
+      });
+    }
+
     const { data, status } = await axios.get('https://storage.googleapis.com/backupdatadev/ejercicio/ventas.json')
 
     if (status !== 200) {
-      res.status(500).send({
+      return res.status(500).send({
         message: 'Error en el Servidor'
       });
     }
@@ -116,7 +415,7 @@ exports.productosPorFecha = async (req, res) => {
       const products = []
       for (const prodDetail of inputs.products) {
         const fechaProd = new Date(inputs.date_closed.split(' ')[0])
-        if(fechaInicio <= fechaProd && fechaFinal >= fechaProd) {
+        if (fechaInicio <= fechaProd && fechaFinal >= fechaProd) {
           prodDetail.fecha = inputs.date_closed.split(' ')[0]
           products.push(prodDetail)
         }
@@ -124,36 +423,78 @@ exports.productosPorFecha = async (req, res) => {
       productosTotales = productosTotales.concat(products)
     }
 
-    const productosCategorias =
-      _.mapValues(
-        _.groupBy(productosTotales, 'category'),
-        el => el.map(el2 => _.omit(el2, 'category'))
-      )
+    const productosCategorias = agruparDatos(productosTotales, 'name')
 
     const resp = {}
     for (const [key, products] of Object.entries(productosCategorias)) {
-      const productosNombre =
-        _.mapValues(
-          _.groupBy(products, 'name'),
-          el => el.map(el2 => _.omit(el2, 'name'))
-        )
-
-      for (const [key2, infoProd] of Object.entries(productosNombre)) {
-        let priceTotal = 0
-        let quantityTotal = 0
-        for (priceQty of infoProd) {
-          priceTotal += priceQty.price
-          quantityTotal += priceQty.quantity
-        }
-        productosNombre[key2] = { priceTotal, quantityTotal }
+      let amountTotal = 0
+      let quantityTotal = 0
+      for (const payment of products) {
+        amountTotal += payment.price
+        quantityTotal += payment.quantity
       }
-      resp[key] = productosNombre
+      resp[key] = { amountTotal, quantityTotal }
     }
-    res.send(productosTotales)
+    res.send(resp)
 
   } catch (error) {
     res.status(500).send({
       message: error
     });
   }
-};
+}
+
+exports.ventaPorId = async (req, res) => {
+  try {
+    const {
+      id,
+      mesero,
+      cajero,
+      fecha,
+      mesa,
+      zona
+    } = req.query;
+
+    const { data, status } = await axios.get('https://storage.googleapis.com/backupdatadev/ejercicio/ventas.json')
+
+    if (status !== 200) {
+      res.status(500).send({
+        message: 'Error en el Servidor'
+      });
+    }
+    var resp = data
+    if(id)
+      resp = _.filter(resp, el => el.id.includes(id))
+    if(mesero)
+      resp = _.filter(resp, el => el.waiter.includes(mesero))
+    if(cajero)
+      resp = _.filter(resp, el => el.cashier.includes(cajero))
+    if(fecha)
+      resp = _.filter(resp, el => el.date_closed.includes(fecha))
+    if(mesa)
+      resp = _.filter(resp, el => el.table == mesa)
+    if(zona)
+      resp = _.filter(resp, el => el.zone == zona)
+    res.send(resp)
+
+  } catch (error) {
+    console.log(error)
+    res.status(500).send({
+      message: error
+    });
+  }
+}
+
+const agruparDatos = (datos, campo) => {
+  try {
+    const result =
+      _.mapValues(
+        _.groupBy(datos, campo),
+        el => el.map(el2 => _.omit(el2, campo)
+        )
+      )
+    return result
+  } catch (error) {
+    return []
+  }
+}
