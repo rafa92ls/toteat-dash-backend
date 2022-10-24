@@ -7,9 +7,8 @@ module.exports = (app, verification) => {
 
     router.get("/", ventas.findAll);
 
-    router.get("/:id", ventas.findOne);
-
-    router.delete("/", ventas.deleteAll);
+    router.get("/productos", ventas.productos);
+    router.get("/productos/fechas/:fecha1/:fecha2", ventas.productosPorFecha);
 
     app.use('/api/ventas', verification, router);
 };
