@@ -1,9 +1,12 @@
 const axios = require('axios')
 const _ = require('lodash')
+const dataJson = require('../ventas.json')
 
 exports.categorias = async (req, res) => {
   try {
-    const { data, status } = await axios.get('https://storage.googleapis.com/backupdatadev/ejercicio/ventas.json')
+    const delay = ms => new Promise(res => setTimeout(res, ms));
+    await delay(2000)
+    const { data, status } = {data: dataJson, status: 200} //await axios.get('https://storage.googleapis.com/backupdatadev/ejercicio/ventas.json')
 
     if (status !== 200) {
       res.status(500).send({
@@ -52,7 +55,9 @@ exports.categoriasPorFecha = async (req, res) => {
       });
     }
 
-    const { data, status } = await axios.get('https://storage.googleapis.com/backupdatadev/ejercicio/ventas.json')
+    const delay = ms => new Promise(res => setTimeout(res, ms));
+    await delay(2000)
+    const { data, status } = {data: dataJson, status: 200} //await axios.get('https://storage.googleapis.com/backupdatadev/ejercicio/ventas.json')
 
     if (status !== 200) {
       return res.status(500).send({
@@ -101,7 +106,9 @@ exports.categoriasPorFecha = async (req, res) => {
 
 exports.zonas = async (req, res) => {
   try {
-    const { data, status } = await axios.get('https://storage.googleapis.com/backupdatadev/ejercicio/ventas.json')
+    const delay = ms => new Promise(res => setTimeout(res, ms));
+    await delay(2000)
+    const { data, status } = {data: dataJson, status: 200} //await axios.get('https://storage.googleapis.com/backupdatadev/ejercicio/ventas.json')
 
     if (status !== 200) {
       res.status(500).send({
@@ -159,7 +166,9 @@ exports.zonasPorFecha = async (req, res) => {
       });
     }
 
-    const { data, status } = await axios.get('https://storage.googleapis.com/backupdatadev/ejercicio/ventas.json')
+    const delay = ms => new Promise(res => setTimeout(res, ms));
+    await delay(2000)
+    const { data, status } = {data: dataJson, status: 200} //await axios.get('https://storage.googleapis.com/backupdatadev/ejercicio/ventas.json')
 
     if (status !== 200) {
       res.status(500).send({
@@ -217,7 +226,9 @@ exports.zonasPorFecha = async (req, res) => {
 
 exports.meseros = async (req, res) => {
   try {
-    const { data, status } = await axios.get('https://storage.googleapis.com/backupdatadev/ejercicio/ventas.json')
+    const delay = ms => new Promise(res => setTimeout(res, ms));
+    await delay(2000)
+    const { data, status } = {data: dataJson, status: 200} //await axios.get('https://storage.googleapis.com/backupdatadev/ejercicio/ventas.json')
 
     if (status !== 200) {
       res.status(500).send({
@@ -266,7 +277,9 @@ exports.meseros = async (req, res) => {
 
 exports.cajeros = async (req, res) => {
   try {
-    const { data, status } = await axios.get('https://storage.googleapis.com/backupdatadev/ejercicio/ventas.json')
+    const delay = ms => new Promise(res => setTimeout(res, ms));
+    await delay(2000)
+    const { data, status } = {data: dataJson, status: 200} //await axios.get('https://storage.googleapis.com/backupdatadev/ejercicio/ventas.json')
 
     if (status !== 200) {
       res.status(500).send({
@@ -315,9 +328,9 @@ exports.cajeros = async (req, res) => {
 
 exports.mediosPago = async (req, res) => {
   try {
-    const title = req.query.title;
-    var condition = title ? { title: { [Op.like]: `%${title}%` } } : null;
-    const { data, status } = await axios.get('https://storage.googleapis.com/backupdatadev/ejercicio/ventas.json')
+    const delay = ms => new Promise(res => setTimeout(res, ms));
+    await delay(2000)
+    const { data, status } = {data: dataJson, status: 200} //await axios.get('https://storage.googleapis.com/backupdatadev/ejercicio/ventas.json')
 
     if (status !== 200) {
       res.status(500).send({
@@ -356,9 +369,9 @@ exports.mediosPago = async (req, res) => {
 
 exports.productos = async (req, res) => {
   try {
-    const title = req.query.title;
-    var condition = title ? { title: { [Op.like]: `%${title}%` } } : null;
-    const { data, status } = await axios.get('https://storage.googleapis.com/backupdatadev/ejercicio/ventas.json')
+    const delay = ms => new Promise(res => setTimeout(res, ms));
+    await delay(2000)
+    const { data, status } = {data: dataJson, status: 200} //await axios.get('https://storage.googleapis.com/backupdatadev/ejercicio/ventas.json')
 
     if (status !== 200) {
       res.status(500).send({
@@ -402,7 +415,9 @@ exports.productosPorFecha = async (req, res) => {
       });
     }
 
-    const { data, status } = await axios.get('https://storage.googleapis.com/backupdatadev/ejercicio/ventas.json')
+    const delay = ms => new Promise(res => setTimeout(res, ms));
+    await delay(2000)
+    const { data, status } = {data: dataJson, status: 200} //await axios.get('https://storage.googleapis.com/backupdatadev/ejercicio/ventas.json')
 
     if (status !== 200) {
       return res.status(500).send({
@@ -455,7 +470,9 @@ exports.ventaPorId = async (req, res) => {
       zona
     } = req.query;
 
-    const { data, status } = await axios.get('https://storage.googleapis.com/backupdatadev/ejercicio/ventas.json')
+    const delay = ms => new Promise(res => setTimeout(res, ms));
+    await delay(2000)
+    const { data, status } = {data: dataJson, status: 200} //await axios.get('https://storage.googleapis.com/backupdatadev/ejercicio/ventas.json')
 
     if (status !== 200) {
       res.status(500).send({
