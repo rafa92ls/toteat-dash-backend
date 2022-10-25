@@ -262,7 +262,8 @@ exports.meseros = async (req, res) => {
         }
         resp[key] = productosNombre
       }
-      productosTotales[key] = resp
+      
+      productosTotales[key] = {...resp, transactions: zones.length}
     }
 
     res.send(productosTotales)
@@ -313,7 +314,7 @@ exports.cajeros = async (req, res) => {
         }
         resp[key] = productosNombre
       }
-      productosTotales[key] = resp
+      productosTotales[key] = {...resp, transactions: zones.length}
     }
 
     res.send(productosTotales)
@@ -352,11 +353,13 @@ exports.mediosPago = async (req, res) => {
     for (const [key, products] of Object.entries(productosCategorias)) {
 
       let amountTotal = 0
+      let paymentAmount = 0
       for (const payment of products) {
         amountTotal += payment.amount
+        paymentAmount++
       }
 
-      resp[key] = amountTotal
+      resp[key] = {amountTotal, paymentAmount}
     }
     res.send(resp)
 
