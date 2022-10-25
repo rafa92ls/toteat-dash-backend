@@ -19,5 +19,8 @@ module.exports = (app, verification) => {
 
     router.get("/buscar", ventas.ventaPorId)
 
+    router.get("/items-busqueda-avanzada", ventas.itemsBusquedaAvanzada)
+
+
     app.use('/api/ventas', verification, router)
 };
